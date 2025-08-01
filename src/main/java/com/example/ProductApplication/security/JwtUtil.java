@@ -53,22 +53,21 @@ public class JwtUtil {
     }
 
     public String generateToken(User user, UserDetails userDetails) {
-        String role = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElse("");
+    String role = userDetails.getAuthorities().stream()
+        .findFirst()
+        .map(GrantedAuthority::getAuthority)
+        .orElse(""); // returns ROLE_USER or ROLE_ADMIN
 
-        return Jwts.builder()
-                .setSubject(user.getUsername())
-                .claim("userId", user.getId())           // ✅ Include userId here
-                .claim("role", role)
-                .claim("username", user.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-    
+    return Jwts.builder()
+        .setSubject(user.getUsername())
+        .claim("userId", user.getId())
+        .claim("role", role) // storing "ROLE_USER" or "ROLE_ADMIN"
+        .setIssuedAt(new Date(System.currentTimeMillis()))
+        .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+        .signWith(getSignKey(), SignatureAlgorithm.HS256)
+        .compact();
+}
+
     public Long extractUserId(String token) {
         Claims claims = extractAllClaims(token);
         Object userId = claims.get("userId");

@@ -5,6 +5,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,11 +28,16 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/products").permitAll()
-                .requestMatchers("/api/products/**").hasRole("ADMIN")
-                .requestMatchers("/api/purchase/**").hasRole("USER")
-                .anyRequest().authenticated()
-            );
+    .requestMatchers("/api/auth/**").permitAll()
+    .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll() // allow GETs
+    .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+    .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+    .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+    .requestMatchers("/api/purchase/**").hasRole("USER")
+    .anyRequest().authenticated()
+)
+
+;
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

@@ -38,10 +38,11 @@ public ResponseEntity<Product> addProduct(@RequestBody Product product) {
         product.setId(id);
         return productService.saveProduct(product);
     }
+@PreAuthorize("hasRole('ADMIN')")
+@DeleteMapping("/{id}")
+public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+    productService.deleteProduct(id);
+    return ResponseEntity.ok("Product deleted successfully.");
+}
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-    }
 }
